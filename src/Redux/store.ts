@@ -1,14 +1,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import apiSlice from './api/apiSlice';
-import bootCampProgramReducer from './Slices/bootcampProgramSlice';
-import bootcampSourceReducer from './Slices/bootcampSourceSlice';
-import bootCampMediumReducer from './Slices/bootcampMediumSlice';
+import bootCampProgramReducer from './Slices/bootcampProgramSeries';
+import bootcampSourceReducer from './Slices/bootcampSelectivesSlice';
 
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
-  bootCampProgram: bootCampProgramReducer,
+  bootcampProgram: bootCampProgramReducer,
   bootcampSource: bootcampSourceReducer,
-  bootCampMedium: bootCampMediumReducer,
 });
 
 export const store = configureStore({
@@ -18,3 +16,4 @@ export const store = configureStore({
 });
 
 export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-const DateButtons = ({ onFilterChange }: { onFilterChange: any }) => {
-  const [selectedButton, setSelectedButton] = useState(null);
+const DateButtons = ({onDateChange}:{onDateChange:any}) => {
+  const [selectedButton, setSelectedButton] = useState<string | null>("weekBtn");
 
-  const toggleButton = (btnId: any) => {
+  const toggleButton = (btnId: string) => {
     setSelectedButton(btnId);
-    // onFilterChange(btnId); 
+    onDateChange(btnId);
   };
 
   return (

@@ -1,258 +1,241 @@
 "use client";
 
-import React, { useState } from 'react';
-import { FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import Calendar from './Calendar';
 import SubmitButton from './SubmitButton';
+import { useFetchDataKeysMutation } from '@/Redux/api/apiSlice';
+import { useDispatch } from 'react-redux';
+import { setOptionsData, setSelectedParams } from '@/Redux/Slices/bootcampSelectivesSlice';
 
-interface Program {
-  name: string;
-  code: string;
+interface SelectedParamsData {
+  dates: any[]; 
+  table_names: string[];
+  page_titles: string[];
+  utm_sources: string[];
+  utm_mediums: string[];
 }
 
-const pythonbc = {"page":{
-    "2024_04_24":133,
-    "2024_04_25":123,
-    "2024_04_26":111,
-    "2024_04_27":130,
-    "2024_04_28":121,
-    "2024_04_29":123,
-    "2024_04_30":111,
-    "2024_05_01":109,
-    "2024_05_02":108,
-    "2024_05_03":131,
-    "2024_05_04":122,
-    "2024_05_05":121,
-    "2024_05_06":109,
-    "2024_05_07":101,
-    "2024_05_08":112,
-    "2024_05_09":102,
-    "2024_05_10":131,
-    "2024_05_11":100,
-    "2024_05_12":111,
-    "2024_05_13":118,
-    "2024_05_14":122,
-    "2024_05_15":161,
-    "2024_05_16":109,
-    "2024_05_17":141,
-    "2024_05_18":120,
-    "2024_05_19":131,
-    "2024_05_20":121,
-    "2024_05_21":141,
-    "2024_05_22":101,
-    "2024_05_23":121,
-    "2024_05_24":111,
-    "2024_05_25":122,
-    "2024_05_26":142,
-    "2024_05_27":121,
-    "2024_05_28":133,
-    "2024_05_29":110,
-    },
-  "source":{
-    "2024_04_24":102,
-    "2024_04_25":103,
-    "2024_04_26":101,
-    "2024_04_27":160,
-    "2024_04_28":121,
-    "2024_04_29":103,
-    "2024_04_30":121,
-    "2024_05_01":139,
-    "2024_05_02":118,
-    "2024_05_03":111,
-    "2024_05_04":122,
-    "2024_05_05":121,
-    "2024_05_06":109,
-    "2024_05_07":101,
-    "2024_05_08":112,
-    "2024_05_09":122,
-    "2024_05_10":121,
-    "2024_05_11":109,
-    "2024_05_12":100,
-    "2024_05_13":109,
-    "2024_05_14":102,
-    "2024_05_15":101,
-    "2024_05_16":109,
-    "2024_05_17":121,
-    "2024_05_18":130,
-    "2024_05_19":141,
-    "2024_05_20":151,
-    "2024_05_21":121,
-    "2024_05_22":111,
-    "2024_05_23":141,
-    "2024_05_24":121,
-    "2024_05_25":112,
-    "2024_05_26":132,
-    "2024_05_27":141,
-    "2024_05_28":143,
-    "2024_05_29":130,
-  },
-  "medium":{
-    "2024_04_24":122,
-    "2024_04_25":105,
-    "2024_04_26":100,
-    "2024_04_27":130,
-    "2024_04_28":124,
-    "2024_04_29":131,
-    "2024_04_30":101,
-    "2024_05_01":159,
-    "2024_05_02":128,
-    "2024_05_03":151,
-    "2024_05_04":122,
-    "2024_05_05":141,
-    "2024_05_06":119,
-    "2024_05_07":121,
-    "2024_05_08":162,
-    "2024_05_09":112,
-    "2024_05_10":141,
-    "2024_05_11":119,
-    "2024_05_12":160,
-    "2024_05_13":139,
-    "2024_05_14":152,
-    "2024_05_15":121,
-    "2024_05_16":119,
-    "2024_05_17":131,
-    "2024_05_18":140,
-    "2024_05_19":121,
-    "2024_05_20":131,
-    "2024_05_21":131,
-    "2024_05_22":121,
-    "2024_05_23":151,
-    "2024_05_24":111,
-    "2024_05_25":122,
-    "2024_05_26":122,
-    "2024_05_27":131,
-    "2024_05_28":123,
-    "2024_05_29":120,
-  }
-  }
-
-const programs: Program[] = [
-  { name: 'Python Bootcamp (PBC)', code: 'PBC' },
-  { name: 'TensorFlow Bootcamp (TBC)', code: 'TBC' },
-  { name: 'OpenCV Bootcamp (OBC)', code: 'OBC' }
-];
-const sources: Program[] = [
-    { name: 'google', code: 'google' },
-    { name: 'ocvu', code: 'ocvu' },
-    { name: 'ocv', code: 'ocv' },
-    { name: 'locv', code: 'locv' },
-    { name: 'Facebook', code: 'Facebook' },
-    { name: 'Instagram', code: 'Instagram' },
-  ];
-
-const mediums: Program[] = [
-    { name: 'Medium 01', code: 'medium_1' },
-    { name: 'Medium 02', code: 'medium_2' },
-    { name: 'Medium 03', code: 'medium_3' },
-    { name: 'Medium 04', code: 'medium_4' },
-    { name: 'Medium 05', code: 'medium_5' },
-    { name: 'Medium 06', code: 'medium_6' },
-    { name: 'Medium 07', code: 'medium_7' },
-    { name: 'Medium 018', code: 'medium_8' },
-  ];
-
-
-function FilterUtm({onFilterChange}:{onFilterChange:any}) {
+function FilterUtm({selectedDateRange}:{selectedDateRange:string}) {
+  const [selectedTables, setSelectedTables] = React.useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = React.useState<string[]>([]);
   const [selectedSources, setSelectedSources] = React.useState<string[]>([]);
   const [selectedMediums, setSelectedMediums] = React.useState<string[]>([]);
+  const [paramDates, setParamDates] = useState([])
   const [showPicker, setShowPicker] = useState(false);
+  const [selectedParamsData, setSelectedParamsData] = useState<SelectedParamsData>({
+    dates: [], 
+    table_names: [],
+    page_titles: [],
+    utm_sources: [],
+    utm_mediums: [],
+  });
+  const [paramsData, setParamsData] = useState<SelectedParamsData>({
+    dates: [], 
+    table_names: [],
+    page_titles: [],
+    utm_sources: [],
+    utm_mediums: [],
+  });
+  const dispatch = useDispatch();
 
-  const handleChangeProgram = (event :SelectChangeEvent<string[]>) => {
-    const {target: { value }} = event;
-    onFilterChange(pythonbc);
-    setSelectedPrograms(typeof value === 'string' ? value.split(',') : [value[value.length - 1]]);
+  useEffect(() => {
+    handleAddUser();
+  }, []); 
+
+  const [fetchDataKeys, { isLoading, isError, data, error }] = useFetchDataKeysMutation()
+
+  const handleAddUser = async () => {
+    try {
+      const response = await fetchDataKeys(["table_names","page_titles", "utm_sources", "utm_mediums"]).unwrap();
+      setParamsData(response);
+    } catch (error) {
+      console.log("Error:", error)
+    }
+  }
+
+  const handleChangeTable = (event: SelectChangeEvent<string | string[]>) => {
+    const value: string[] = Array.isArray(event.target.value) ? event.target.value : [event.target.value];
+    setSelectedTables(value);
+    setSelectedParamsData((prevSelectedParamsData) => ({...prevSelectedParamsData, table_names: [...prevSelectedParamsData.table_names, value[value.length - 1]]}));
+  };
+
+  const handleChangeProgram = (event: SelectChangeEvent<string | string[]>) => {
+    const value: string[] = Array.isArray(event.target.value) ? event.target.value : [event.target.value];
+    setSelectedPrograms(value);
+    setSelectedParamsData((prevSelectedParamsData) => ({...prevSelectedParamsData, page_titles: [...prevSelectedParamsData.page_titles, value[value.length - 1]]}));
+  };
+  
+  const handleChangeSource = (event: SelectChangeEvent<string | string[]>) => {
+    const value: string[] = Array.isArray(event.target.value) ? event.target.value : [event.target.value];
+    setSelectedSources(value);
+    setSelectedParamsData((prevSelectedParamsData) => ({...prevSelectedParamsData, utm_sources: [...prevSelectedParamsData.utm_sources, value[value.length - 1]]}));
+  };
+  
+  const handleChangeMedium = (event: SelectChangeEvent<string | string[]>) => {
+    const value: string[] = Array.isArray(event.target.value) ? event.target.value : [event.target.value];
+    setSelectedMediums(value);
+    setSelectedParamsData((prevSelectedParamsData) => ({...prevSelectedParamsData, utm_mediums: [...prevSelectedParamsData.utm_mediums, value[value.length - 1]]}));
+  };
+
+  const getDates = (dates: any) => {
+    setParamDates(dates);
+    setSelectedParamsData((prevSelectedParamsData) => ({...prevSelectedParamsData, dates:dates}));
+  };
+
+    const setParams = () =>{
+      dispatch(setSelectedParams({
+        dates: paramDates,
+        table_names: selectedTables,
+        page_titles: selectedPrograms,
+        utm_sources: selectedSources,
+        utm_mediums: selectedMediums
+      }));
+
+      setSelectedParamsData({
+        dates: [], 
+        table_names: [],
+        page_titles: [],
+        utm_sources: [],
+        utm_mediums: [],
+      })
     };
-
-
-  const handleChangeSource = (event: SelectChangeEvent<string[]>) => {
-    const value = event.target.value;
-    setSelectedSources(
-      typeof value === 'string' ? value.split(',') : value
-    );
-  };
-
-  const handleChangeMedium = (event: SelectChangeEvent<string[]>) => {
-    const value = event.target.value;
-    setSelectedMediums(
-      typeof value === 'string' ? value.split(',') : value
-    );
-  };
-
+  
   return (
-<div className='w-full flex lg:flex-row md:flex-row max-sm:flex-col sm:flex-col justify-around lg:m-2 md:m-2 sm:my-2 max-sm:my-2 lg:space-x-2 md:space-x-2'>
-    <div >
-        <Calendar visible={showPicker} onClose={() => setShowPicker(false)} onFilterChange={onFilterChange}/>
+    <div className='w-full flex lg:flex-row md:flex-row max-sm:flex-col sm:flex-col justify-around lg:m-2 md:m-2 sm:my-2 max-sm:my-2 lg:space-x-2 md:space-x-2'>
+      <div >
+        <Calendar visible={showPicker} onClose={() => setShowPicker(false)} getDates={getDates} selectedDateRange={selectedDateRange}/>
         <div onClick={() => setShowPicker(true)} className="relative inline-flex items-center justify-start px-6 py-3 overflow-hidden font-medium transition-all bg-red-500 rounded-xl group">
-        <span className="absolute top-0 right-0 inline-block w-4 h-4 transition-all duration-500 ease-in-out bg-red-700 rounded group-hover:-mr-4 group-hover:-mt-4">
-        <span className="absolute top-0 right-0 w-5 h-5 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
-        </span>
-        <span className="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-red-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"></span>
-        <span className="relative w-full text-left p-1 text-white transition-colors duration-200 ease-in-out group-hover:text-white">Dates</span>
+          <span className="absolute top-0 right-0 inline-block w-4 h-4 transition-all duration-500 ease-in-out bg-red-700 rounded group-hover:-mr-4 group-hover:-mt-4">
+            <span className="absolute top-0 right-0 w-5 h-5 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
+          </span>
+          <span className="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-red-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"></span>
+          <span className="relative w-full text-left p-1 text-white transition-colors duration-200 ease-in-out group-hover:text-white">Dates</span>
         </div>
-    </div>
-    <FormControl className='max-sm:w-full sm:w-full'>
-        <InputLabel id="demo-multiple-checkbox-label">Bootcamp Programs</InputLabel>
+      </div>
+      {paramsData.table_names && (
+      <FormControl className='max-sm:w-full sm:w-full'>
+        <InputLabel id="demo-multiple-checkbox-label">Bootcamp Tables</InputLabel>
         <Select
-            labelId="demo-multiple-checkbox-label"
-            id="demo-multiple-checkbox"
-            multiple
-            value={selectedPrograms}
-            onChange={handleChangeProgram}
-            input={<OutlinedInput label="Bootcamp Programs" />}
-            renderValue={(selected) => selected.join(', ')}
+          labelId="demo-multiple-checkbox-label"
+          id="demo-multiple-checkbox"
+          multiple
+          value={selectedTables}
+          onChange={handleChangeTable}
+          input={<OutlinedInput label="Bootcamp Tables" />}
+          renderValue={(selected) => selected.join(', ')}
         >
-            {programs.map((program) => (
-            <MenuItem key={program.code} value={program.name}>
-                <Checkbox checked={selectedPrograms.indexOf(program.name) > -1} />
-                <ListItemText primary={program.name} />
+          {paramsData.table_names.filter(table => table !== null).map((table) => (
+            <MenuItem key={table} value={table!}>
+              <Checkbox checked={selectedTables.indexOf(table!) > -1} />
+              <ListItemText primary={table!} />
             </MenuItem>
-            ))}
+          ))}
         </Select>
-    </FormControl>
-    <FormControl className='max-sm:w-full sm:w-full max-sm:my-2'>
+      </FormControl>
+      )}
+      {paramsData.page_titles && (
+      <FormControl className='max-sm:w-full sm:w-full'>
+        <InputLabel id="demo-multiple-checkbox-label">Bootcamp Pages</InputLabel>
+        <Select
+          labelId="demo-multiple-checkbox-label"
+          id="demo-multiple-checkbox"
+          multiple
+          value={selectedPrograms}
+          onChange={handleChangeProgram}
+          input={<OutlinedInput label="Bootcamp Programs" />}
+          renderValue={(selected) => selected.join(', ')}
+        >
+          {paramsData.page_titles.filter(title => title !== null).map((title) => (
+            <MenuItem key={title} value={title!}>
+              <Checkbox checked={selectedPrograms.indexOf(title!) > -1} />
+              <ListItemText primary={title!} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      )}
+      {paramsData.page_titles && (
+      <FormControl className='max-sm:w-full sm:w-full max-sm:my-2'>
         <InputLabel id="demo-multiple-checkbox-label">Bootcamp Sources</InputLabel>
         <Select
-            labelId="demo-multiple-checkbox-label"
-            id="demo-multiple-checkbox"
-            multiple
-            value={selectedSources}
-            onChange={handleChangeSource}
-            input={<OutlinedInput label="Bootcamp Sources" />}
-            renderValue={(selected) => selected.join(', ')}
+          labelId="demo-multiple-checkbox-label"
+          id="demo-multiple-checkbox"
+          multiple
+          value={selectedSources}
+          onChange={handleChangeSource}
+          input={<OutlinedInput label="Bootcamp Sources" />}
+          renderValue={(selected) => selected.join(', ')}
         >
-            {sources.map((source) => (
-            <MenuItem key={source.code} value={source.name}>
-                <Checkbox checked={selectedSources.indexOf(source.name) > -1} />
-                <ListItemText primary={source.name} />
+          {paramsData.utm_sources.filter(source => source !== null).map((source) => (
+            <MenuItem key={source} value={source!}>
+              <Checkbox checked={selectedSources.indexOf(source!) > -1} />
+              <ListItemText primary={source!} />
             </MenuItem>
-            ))}
+          ))}
         </Select>
-    </FormControl>
-    <FormControl className='max-sm:w-full sm:w-full'>
+      </FormControl>
+    )}
+      {paramsData.page_titles && (
+      <FormControl className='max-sm:w-full sm:w-full'>
         <InputLabel id="demo-multiple-checkbox-label">Bootcamp Mediums</InputLabel>
         <Select
-            labelId="demo-multiple-checkbox-label"
-            id="demo-multiple-checkbox"
-            multiple
-            value={selectedMediums}
-            onChange={handleChangeMedium}
-            input={<OutlinedInput label="Bootcamp Mediums" />}
-            renderValue={(selected) => selected.join(', ')}
+          labelId="demo-multiple-checkbox-label"
+          id="demo-multiple-checkbox"
+          multiple
+          value={selectedMediums}
+          onChange={handleChangeMedium}
+          input={<OutlinedInput label="Bootcamp Mediums" />}
+          renderValue={(selected) => selected.join(', ')}
         >
-            {mediums.map((medium) => (
-            <MenuItem key={medium.code} value={medium.name}>
-                <Checkbox checked={selectedMediums.indexOf(medium.name) > -1} />
-                <ListItemText primary={medium.name} />
+          {paramsData.utm_mediums.filter(medium => medium !== null).map((medium) => (
+            <MenuItem key={medium} value={medium!}>
+              <Checkbox checked={selectedMediums.indexOf(medium!) > -1} />
+              <ListItemText primary={medium!} />
             </MenuItem>
-            ))}
+          ))}
         </Select>
-    </FormControl>
-    <SubmitButton />
-</div>
+      </FormControl>
+    )}
 
+    <div onClick={setParams}>
+      <SubmitButton selectedParams={selectedParamsData} />         
+    </div>
+     
+    </div>
   );
 }
 
 export default FilterUtm;
+
+// const setParams = () => {
+//   const paramsToUpdate: SelectedParamsData = {
+//     dates: paramDates.length > 0 ? paramDates : [],
+//     table_names: selectedTables.length > 0 ? selectedTables : [],
+//     page_titles: selectedPrograms.length > 0 ? selectedPrograms : [],
+//     utm_sources: selectedSources.length > 0 ? selectedSources : [],
+//     utm_mediums: selectedMediums.length > 0 ? selectedMediums : []
+//   };
+
+//   const filteredParams: SelectedParamsData = {
+//     dates: [],
+//     table_names: [],
+//     page_titles: [],
+//     utm_sources: [],
+//     utm_mediums: []
+//   };
+
+ // Update filteredParams with non-empty values
+//   Object.entries(paramsToUpdate).forEach(([key, value]) => {
+//     if ((value as any[]).length > 0) {
+//       (filteredParams as any)[key] = value;
+//     } else {
+//       delete (filteredParams as any)[key];  // Delete the key if the array is empty
+//     }
+//   });
+
+//   if (Object.keys(filteredParams).length > 0) {
+//     dispatch(setSelectedParams(filteredParams));
+//   }
+// };
