@@ -11,10 +11,10 @@ type Props = {
   onClose: () => void;
   getDates: (dates: string[]) => void;
   selectedDateRange: string;
+  handleButtonToggle: (dates: boolean) => void;
 };
 
-const Calendar: React.FC<Props> = ({ visible, onClose, getDates, selectedDateRange }) => {
-  console.log("selectedDateRange", selectedDateRange);
+const Calendar: React.FC<Props> = ({ visible, onClose, getDates, selectedDateRange, handleButtonToggle }) => {
 
   const getInitialDateRange = () => {
     const today = new Date();
@@ -54,11 +54,12 @@ const Calendar: React.FC<Props> = ({ visible, onClose, getDates, selectedDateRan
     return () => {
       document.removeEventListener('keydown', handleEscKey);
     };
-  }, []); // Effect for handling the escape key, should only run once
+  }, []);
 
   const handleSelect = (ranges: any) => {
     const { selection } = ranges;
     setDateRange({ startDate: selection.startDate, endDate: selection.endDate });
+    handleButtonToggle(false);
   };
 
   return (

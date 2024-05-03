@@ -3,18 +3,24 @@ import { createSlice } from '@reduxjs/toolkit';
 const bootcampProgramSlice = createSlice({
   name: 'bootcampProgram',
   initialState: {
-    selected: '',
     seriesData: [], 
   },
   reducers: {
-    setSelectedProgram(state, action) {
-      state.selected = action.payload;
-    },
     setSeriesData(state, action) {
       state.seriesData = [...state.seriesData, ...action.payload]; 
     },
+    setDeleteItem(state, action) {
+      const deleteStrings = action.payload;
+      state.seriesData = state.seriesData.filter(item => {
+        const matched = item.name.some(name => deleteStrings.includes(name));
+        return !matched;
+      });
+    },
+    setDeleteBase(state){
+      state.seriesData = []
+    }
   },
 });
 
-export const { setSelectedProgram, setSeriesData } = bootcampProgramSlice.actions;
+export const { setSeriesData, setDeleteItem, setDeleteBase } = bootcampProgramSlice.actions;
 export default bootcampProgramSlice.reducer;

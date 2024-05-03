@@ -1,30 +1,40 @@
 import { useFetchDataMutation } from '@/Redux/api/apiSlice';
 import { useDispatch } from 'react-redux';
 import React from 'react';
-import { setSeriesData } from '@/Redux/Slices/bootcampProgramSeries';
+import { setSeriesData, setDeleteItem  } from '@/Redux/Slices/bootcampProgramSeries';
+
+interface SelectedParamsData {
+  dates: any[]; 
+  table_names: string[];
+  page_titles: string[];
+  utm_sources: string[];
+  utm_mediums: string[];
+}
 
 
-const SubmitButton = ({ selectedParams }: { selectedParams: any }) => {
+const SubmitButton = ({ selectedParams, removedParams }: { selectedParams: SelectedParamsData, removedParams:string[] }) => {
   const [fetchSeries, { isLoading, isError, data, error }] = useFetchDataMutation();
   const dispatch = useDispatch();
-  console.log("selectedParams", selectedParams);
 
   const getSeriesData = async () => {
-
     try {
       const filteredParams = Object.fromEntries(
         Object.entries(selectedParams).filter(([key, value]) => Array.isArray(value) && value.length > 0)
       );
+      console.log("filteredParams", selectedParams, removedParams)
   
-      const response = await fetchSeries(filteredParams).unwrap();
-      const formattedData = formatData(response);
-      dispatch(setSeriesData(formattedData));
-      console.log("fetchSeries", response);
+      dispatch(setDeleteItem(removedParams));
+      if ( filteredParams.table_names.length > 0 || filteredParams.page_titles.length > 0 || filteredParams.utm_sources.length > 0 || filteredParams.utm_mediums.length > 0) {
+        const response = await fetchSeries(filteredParams).unwrap();
+        const formattedData = formatData(response);
+        console.log("setDeleteItem", filteredParams)
+        dispatch(setSeriesData(formattedData));
+      }
+
     } catch (error) {
       console.log("Error:", error);
     }
   };
-  
 
   interface CourseData {
     name: string[];
