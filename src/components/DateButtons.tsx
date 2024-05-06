@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const DateButtons = ({ onDateChange, buttonSelectionToggle, handleButtonToggle }: { onDateChange: any; buttonSelectionToggle: boolean, handleButtonToggle:any }) => {
   const [selectedButton, setSelectedButton] = useState<string | null>(buttonSelectionToggle ? 'weekBtn' : null);
-  console.log("buttonSelectionToggle", buttonSelectionToggle)
+  // console.log("buttonSelectionToggle", buttonSelectionToggle)
 
   useEffect(() => {
     if (!buttonSelectionToggle) {

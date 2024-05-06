@@ -44,6 +44,14 @@ function FilterUtm({selectedDateRange, handleButtonToggle}:{selectedDateRange:st
 
   const [fetchDataKeys, { isLoading, isError, data, error }] = useFetchDataKeysMutation()
 
+  const handleSelectAll = () => {
+    setSelectedSources(paramsData.utm_sources.filter(source => source !== null));
+  };
+  
+  const handleDeselectAll = () => {
+    setSelectedSources([]);
+  };
+
   const handleAddUser = async () => {
     try {
       const response = await fetchDataKeys(["table_names","page_titles", "utm_sources", "utm_mediums"]).unwrap();
@@ -154,10 +162,6 @@ function FilterUtm({selectedDateRange, handleButtonToggle}:{selectedDateRange:st
           input={<OutlinedInput label="Bootcamp Tables" />}
           renderValue={(selected) => selected.join(', ')}
         >
-            {/* <MenuItem>
-              <Checkbox checked={selectedTables.indexOf(table!) > -1} />
-              <ListItemText primary={table!} />
-            </MenuItem> */}
           {paramsData.table_names.filter(table => table !== null).map((table) => (
             <MenuItem key={table} value={table!}>
               <Checkbox checked={selectedTables.indexOf(table!) > -1} />
@@ -188,28 +192,37 @@ function FilterUtm({selectedDateRange, handleButtonToggle}:{selectedDateRange:st
         </Select>
       </FormControl>
       )}
-      {paramsData.page_titles && (
-      <FormControl className='max-sm:w-full sm:w-full max-sm:my-2'>
-        <InputLabel id="demo-multiple-checkbox-label">Utm Sources</InputLabel>
-        <Select
-          labelId="demo-multiple-checkbox-label"
-          id="demo-multiple-checkbox"
-          multiple
-          value={selectedSources}
-          onChange={handleChangeSource}
-          input={<OutlinedInput label="Bootcamp Sources" />}
-          renderValue={(selected) => selected.join(', ')}
-        >
-          {paramsData.utm_sources.filter(source => source !== null).map((source) => (
-            <MenuItem key={source} value={source!}>
-              <Checkbox checked={selectedSources.indexOf(source!) > -1} />
-              <ListItemText primary={source!} />
+      {paramsData.utm_sources && (
+        <FormControl className='max-sm:w-full sm:w-full max-sm:my-2'>
+          <InputLabel id="demo-multiple-checkbox-label">Utm Sources</InputLabel>
+          <Select
+            labelId="demo-multiple-checkbox-label"
+            id="demo-multiple-checkbox"
+            multiple
+            value={selectedSources}
+            onChange={handleChangeSource}
+            input={<OutlinedInput label="Bootcamp Sources" />}
+            renderValue={(selected) => selected.join(', ')}
+          >
+            <MenuItem key="select-all" onClick={() => handleSelectAll()} disabled={selectedSources.length === paramsData.utm_sources.length}>
+              <Checkbox checked={selectedSources.length === paramsData.utm_sources.length} />
+              <ListItemText primary="Select All" />
             </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    )}
-      {paramsData.page_titles && (
+            <MenuItem key="deselect-all" onClick={() => handleDeselectAll()} disabled={selectedSources.length === 0}>
+              <Checkbox checked={false} />
+              <ListItemText primary="Deselect All" />
+            </MenuItem>
+            {paramsData.utm_sources.filter(source => source !== null).map((source) => (
+              <MenuItem key={source} value={source!}>
+                <Checkbox checked={selectedSources.indexOf(source!) > -1} />
+                <ListItemText primary={source!} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+
+      {paramsData.utm_mediums && (
       <FormControl className='max-sm:w-full sm:w-full'>
         <InputLabel id="demo-multiple-checkbox-label">Utm Mediums</InputLabel>
         <Select

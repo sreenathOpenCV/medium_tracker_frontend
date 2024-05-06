@@ -14,7 +14,6 @@ const HomeSection = () => {
   };
 
   const handleButtonToggle = (value:boolean) => {
-    console.log("handleButtonToggle", value)
     setButtonSelectionToggle(value);
   };
 

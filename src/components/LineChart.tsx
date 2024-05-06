@@ -22,7 +22,7 @@ const ApexChart = () => {
         intersect: false,
       },
       colors: [
-        "#00FFFF", "#FF00FF", "#FF4500", "#00CED1", "#7FFF00", "#8A2BE2", "#800080", "#FFD700", "#40E0D0", "#FF6347",
+        "#00FFFF", "#e5598c", "#FF4500", "#00CED1", "#7FFF00", "#8A2BE2", "#800080", "#FFD700", "#40E0D0", "#FF6347",
         "#6495ED", "#FF69B4", "#4682B4", "#20B2AA", "#DAA520", "#8B008B", "#228B22", "#800000", "#4169E1", "#FFA07A",
         "#FF7F50", "#00FA9A", "#32CD32", "#00FF7F", "#9932CC", "#00FF00", "#FF1493", "#7CFC00", "#9370DB", "#00FFFF",
         "#B22222", "#ADFF2F", "#FA8072", "#FFE4B5", "#1E90FF", "#FF8C00", "#FAEBD7", "#556B2F", "#FF4500", "#00FF00",
@@ -35,7 +35,6 @@ const ApexChart = () => {
 
   useEffect(() => {
     chartData.series = seriesData;
-    console.log("changed", seriesData)
   }, [seriesData]);
 
   return (

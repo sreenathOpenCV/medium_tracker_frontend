@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { DateRangePicker, Range } from 'react-date-range';
 import { addDays, subDays, startOfMonth, endOfMonth, addMonths, format, eachDayOfInterval } from 'date-fns';
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
 
 type Props = {
   visible: boolean;
@@ -15,6 +15,7 @@ type Props = {
 };
 
 const Calendar: React.FC<Props> = ({ visible, onClose, getDates, selectedDateRange, handleButtonToggle }) => {
+  console.log("selectedDateRange", selectedDateRange)
 
   const getInitialDateRange = () => {
     const today = new Date();
@@ -33,7 +34,7 @@ const Calendar: React.FC<Props> = ({ visible, onClose, getDates, selectedDateRan
   const [dateRange, setDateRange] = useState(getInitialDateRange());
 
   useEffect(() => {
-    setDateRange(getInitialDateRange()); // Only update when selectedDateRange changes
+    setDateRange(getInitialDateRange());
   }, [selectedDateRange]);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const Calendar: React.FC<Props> = ({ visible, onClose, getDates, selectedDateRan
     const range = eachDayOfInterval({ start: startDate, end: endDate });
     const formattedDates = range.map(date => format(date, 'yyyy-MM-dd'));
     getDates(formattedDates);
-  }, [dateRange]); // This effect handles updating the dates based on the current date range
+  }, [dateRange]);
 
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {

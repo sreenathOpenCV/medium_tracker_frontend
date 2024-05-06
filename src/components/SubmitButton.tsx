@@ -1,7 +1,7 @@
 import { useFetchDataMutation } from '@/Redux/api/apiSlice';
 import { useDispatch } from 'react-redux';
 import React from 'react';
-import { setSeriesData, setDeleteItem  } from '@/Redux/Slices/bootcampProgramSeries';
+import { setSeriesData, setDeleteItem, setDeleteBase } from '@/Redux/Slices/bootcampProgramSeries';
 
 interface SelectedParamsData {
   dates: any[]; 
@@ -10,7 +10,6 @@ interface SelectedParamsData {
   utm_sources: string[];
   utm_mediums: string[];
 }
-
 
 const SubmitButton = ({ selectedParams, removedParams }: { selectedParams: SelectedParamsData, removedParams:string[] }) => {
   const [fetchSeries, { isLoading, isError, data, error }] = useFetchDataMutation();
@@ -21,10 +20,14 @@ const SubmitButton = ({ selectedParams, removedParams }: { selectedParams: Selec
       const filteredParams = Object.fromEntries(
         Object.entries(selectedParams).filter(([key, value]) => Array.isArray(value) && value.length > 0)
       );
-      console.log("filteredParams", selectedParams, removedParams)
+      if(filteredParams.dates.length > 0){
+        dispatch(setDeleteBase());
+      }
+      else{
+        dispatch(setDeleteItem(removedParams));
+      }
   
-      dispatch(setDeleteItem(removedParams));
-      if ( filteredParams.table_names.length > 0 || filteredParams.page_titles.length > 0 || filteredParams.utm_sources.length > 0 || filteredParams.utm_mediums.length > 0) {
+      if (filteredParams.dates.length > 0 || filteredParams.table_names.length > 0 || filteredParams.page_titles.length > 0 || filteredParams.utm_sources.length > 0 || filteredParams.utm_mediums.length > 0) {
         const response = await fetchSeries(filteredParams).unwrap();
         const formattedData = formatData(response);
         console.log("setDeleteItem", filteredParams)
