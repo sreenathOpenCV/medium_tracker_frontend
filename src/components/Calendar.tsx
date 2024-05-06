@@ -35,7 +35,7 @@ const Calendar: React.FC<Props> = ({ visible, onClose, getDates, selectedDateRan
 
   useEffect(() => {
     setDateRange(getInitialDateRange());
-  }, [selectedDateRange]);
+  }, [handleButtonToggle]);
 
   useEffect(() => {
     const { startDate, endDate } = dateRange;
