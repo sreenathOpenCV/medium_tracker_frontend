@@ -14,6 +14,7 @@ interface SelectedParamsData {
   utm_sources: string[];
   utm_mediums: string[];
 }
+
 function FilterUtm({selectedDateRange, handleButtonToggle}:{selectedDateRange:string, handleButtonToggle:any}) {
   const [selectedTables, setSelectedTables] = React.useState<string[]>([]);
   const [selectedPrograms, setSelectedPrograms] = React.useState<string[]>([]);
@@ -43,14 +44,6 @@ function FilterUtm({selectedDateRange, handleButtonToggle}:{selectedDateRange:st
   }, []); 
 
   const [fetchDataKeys, { isLoading, isError, data, error }] = useFetchDataKeysMutation()
-
-  const handleSelectAll = () => {
-    setSelectedSources(paramsData.utm_sources.filter(source => source !== null));
-  };
-  
-  const handleDeselectAll = () => {
-    setSelectedSources([]);
-  };
 
   const handleAddUser = async () => {
     try {
@@ -137,17 +130,22 @@ function FilterUtm({selectedDateRange, handleButtonToggle}:{selectedDateRange:st
         utm_mediums: [],
       })
     };
+
+    const formatDate = (date: string) => {
+      const [year, month, day] = date.split('-');
+      return `${day}-${month}`;
+    };
   
   return (
     <div className='w-full flex lg:flex-row md:flex-row max-sm:flex-col sm:flex-col justify-around lg:m-2 md:m-2 sm:my-2 max-sm:my-2 lg:space-x-2 md:space-x-2'>
       <div >
         <Calendar visible={showPicker} onClose={() => setShowPicker(false)} getDates={getDates} selectedDateRange={selectedDateRange} handleButtonToggle={handleButtonToggle}/>
-        <div onClick={() => setShowPicker(true)} className="relative inline-flex items-center justify-start px-6 py-3 overflow-hidden font-medium transition-all bg-red-500 rounded-xl group">
+        <div onClick={() => setShowPicker(true)} className="relative inline-flex items-center justify-start px-6 py-2.5 overflow-hidden font-medium transition-all bg-red-500 rounded-xl group">
           <span className="absolute top-0 right-0 inline-block w-4 h-4 transition-all duration-500 ease-in-out bg-red-700 rounded group-hover:-mr-4 group-hover:-mt-4">
             <span className="absolute top-0 right-0 w-5 h-5 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
           </span>
           <span className="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-red-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"></span>
-          <span className="relative w-full text-left p-1 text-white transition-colors duration-200 ease-in-out group-hover:text-white">Dates</span>
+          <span className="relative w-full text-left text-white text-[12px] transition-colors duration-200 ease-in-out group-hover:text-white">{paramDates.length > 0 && `Dates: ${formatDate(paramDates[paramDates.length - 1])}/${formatDate(paramDates[0])}`}</span>
         </div>
       </div>
       {paramsData.table_names && (
@@ -204,14 +202,6 @@ function FilterUtm({selectedDateRange, handleButtonToggle}:{selectedDateRange:st
             input={<OutlinedInput label="Bootcamp Sources" />}
             renderValue={(selected) => selected.join(', ')}
           >
-            <MenuItem key="select-all" onClick={() => handleSelectAll()} disabled={selectedSources.length === paramsData.utm_sources.length}>
-              <Checkbox checked={selectedSources.length === paramsData.utm_sources.length} />
-              <ListItemText primary="Select All" />
-            </MenuItem>
-            <MenuItem key="deselect-all" onClick={() => handleDeselectAll()} disabled={selectedSources.length === 0}>
-              <Checkbox checked={false} />
-              <ListItemText primary="Deselect All" />
-            </MenuItem>
             {paramsData.utm_sources.filter(source => source !== null).map((source) => (
               <MenuItem key={source} value={source!}>
                 <Checkbox checked={selectedSources.indexOf(source!) > -1} />
