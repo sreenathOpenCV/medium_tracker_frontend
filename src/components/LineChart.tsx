@@ -15,6 +15,13 @@ const ApexChart = () => {
         id: 'chart2',
         height: 500,
       },
+      xaxis:{
+        tickAmount: 10,
+        labels: {
+          rotate: 0,
+          rotateAlways: false
+        }
+      },
       tooltip: {
         enabled: true,
         followCursor: false,
@@ -38,9 +45,13 @@ const ApexChart = () => {
   }, [seriesData]);
 
   return (
+    <>
+    {(typeof window !== 'undefined') &&
     <div id="chart">
       <ReactApexChart options={chartData.options} series={chartData.series} type="line" height={500} />
     </div>
+    }
+    </>
   );
 };
 
